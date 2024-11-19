@@ -1,113 +1,179 @@
-
-import java.awt.*;
-import java.util.ArrayList;
-import javax.swing.*; // yg J J ini semua komponen dari java swing
-
+import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 public class Goodang {
-    private ArrayList<String> namabarang = new ArrayList<>();
-    private ArrayList<Integer> stokbarang = new ArrayList<>();
-
+    private static LocalDate now = LocalDate.now();
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+    private static String tanggalwaktu = now.format(formatter);
+    private static Scanner sc = new Scanner(System.in);
+    private static String[] goodsName = new String[100];
+    private static int[] goodsStock = new int[100];
+    private static String nama;
+    private static int itemCount = 0;
+    private static int jumlah;
+    private static int index = 0;
+    private static boolean input = true;
+ 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Goodang::new);
+        System.out.println("____________________________________________________________");
+        center("Goodang");
+        center("Halo, harap teliti dalam memasukkan nama dan jumlah barang");
+        center("Selamat bekerja ><");
+        System.out.println("____________________________________________________________");      
+        masukMenu();
+    
+        System.out.println("____________________________________________________________");
+        center("Terima kasih telah menggunakan Goodang");
+        center("Semangat bekerja ><");
+        System.out.println("____________________________________________________________");
     }
-
-    public Goodang() {
-        JFrame frame = new JFrame("Goodang"); //ini buat yg atas tuh
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // kalo ngeclose, dia berhentiin aplikasi secara penuh
-        // JFrame.EXIT_ON_CLOSE: nutup aplikasi sepenuhnya
-        // JFrame.DISPOSE_ON_CLOSE: nutup jendela tetapi tetap menjalankan aplikasi
-        // JFrame.DO_NOTHING_ON_CLOSE: tidak melakukan apa-apa saat jendela ditutup, memungkinkan pengembang untuk menangani penutupan secara manual
-        // JFrame.HIDE_ON_CLOSE: menyembunyikan jendela tetapi tidak menutup aplikasi
-        frame.setSize(480, 800); // ukuran ui
-        frame.setLayout(new BorderLayout()); // buat membagi jd 5 area
-
-        JTextArea areaoutput = new JTextArea(); // ini area yg di tengah tu bang messi, jadi buat anu... apa namanya, ngeluarin output dr input yg kau masukkan td
-        areaoutput.setEditable(false); // biar gabisa diedit-edit, soalnya bisa ngerusak jumlah di dalemnya
-
-        JPanel panelinput = new JPanel(); // ini panel input di atas bang
-        panelinput.setLayout(new GridLayout(3, 2)); // 3 baris 2 kolom, btw ini nanti ubah ya jadi 5 baris 2 kolom // nama dan jumlahnya atas bawah, add dan subtractnya dijejerin
-
-        JTextField inputnama = new JTextField();
-        JTextField inputjumlah = new JTextField();
-
-        JButton addbut = new JButton("Tambah Stok");
-        JButton subtract = new JButton("Kurangi Stok");
-        JButton view = new JButton("Lihat Stok");
-
-        panelinput.add(new JLabel("Nama Barang:"));
-        panelinput.add(inputnama);
-        panelinput.add(new JLabel("Jumlah:"));
-        panelinput.add(inputjumlah);
-        panelinput.add(addbut);
-        panelinput.add(subtract);
-
-        frame.add(panelinput, BorderLayout.NORTH);
-        frame.add(new JScrollPane(areaoutput), BorderLayout.CENTER); // area yang nampilin outputnya ditaroh di tengah
-        frame.add(view, BorderLayout.SOUTH);
-
-        addbut.addActionListener(e -> {
-            String nama = inputnama.getText();
-            int jumlah = inputjumlah(inputjumlah, areaoutput);
-            if (jumlah > 0) {
-                int index = namabarang.indexOf(nama);
-                if (index != -1) {
-                    stokbarang.set(index, stokbarang.get(index) + jumlah);
-                } else {
-                    namabarang.add(nama);
-                    stokbarang.add(jumlah);
-                }
-                areaoutput.append("Stok " + jumlah + " ditambahkan untuk " + nama + ".\n"); // WARN! ubah ini jadi 2 kolom, nama, jumlah, dan keterangan (add or sub)
-            }
-            inputnama.setText("");
-            inputjumlah.setText("");
-        });
-
-        subtract.addActionListener(e -> {
-            String nama = inputnama.getText();
-            int jumlah = inputjumlah(inputjumlah, areaoutput);
-            if (jumlah > 0) {
-                int index = namabarang.indexOf(nama);
-                if (index != -1) {
-                    if (stokbarang.get(index) >= jumlah) {
-                        stokbarang.set(index, stokbarang.get(index) - jumlah);
-                        areaoutput.append("Stok " + jumlah + " dikurangi untuk " + nama + ".\n");
-                    } else {
-                        areaoutput.append("Stok tidak cukup untuk " + nama + ".\n");
+    private static void masukMenu() {
+        while (input) {
+            System.out.printf("Menu\n1. Pengelolaan Gudang\n2. Lihat Stok\n3. Exit\nEnter menu : ");
+            int menu = sc.nextInt();
+            sc.nextLine();
+            System.out.println();
+            if (menu == 1) {
+                boolean operasi = true;
+                while (operasi) {
+                    System.out.println("Masukkan nama barang atau klik X untuk exit: ");
+                    nama = sc.nextLine();
+                    if (nama.equalsIgnoreCase("X")) {
+                        operasi = false;
+                        break;
+                    } else if (nama.isEmpty()) {
+                        continue;
                     }
-                } else {
-                    areaoutput.append("Nama barang tidak ditemukan.\n");
+                    boolean inputJumlah = true;
+                    while (inputJumlah) {
+                        System.out.println("Masukkan jumlah barang: ");
+                        String jumlahBarang = sc.nextLine();
+                        try {
+                            if (Integer.parseInt(jumlahBarang) <= 0) {
+                                System.out.println("Masukkan jumlah!");
+                                continue;
+                            } else if (Integer.parseInt(jumlahBarang) > 0) {
+                                jumlah = Integer.parseInt(jumlahBarang);
+                                break;
+                            }                              
+                        } catch (Exception e) {
+                            System.out.println("Input jumlah harus berupa angka!");
+                            continue;
+                        }
+                    }
+                    System.out.println();
+                        operasi(); 
                 }
+            } else if (menu == 2) {
+                view();
+                continue;
+            } else if (menu == 3){
+                input = false;
+                break;
             }
-            inputnama.setText("");
-            inputjumlah.setText("");
-        });
-
-        view.addActionListener(e -> {
-            areaoutput.append("\nDaftar Stok Barang:\n");
-            for (int i = 0; i < namabarang.size(); i++) {
-                areaoutput.append(namabarang.get(i) + ": " + stokbarang.get(i) + "\n");
-            }
-        });
-
-        frame.setVisible(true);
+        }         
     }
-
-    private int inputjumlah(JTextField inputjumlah, JTextArea areaoutput) {
-        int jumlah = -1;
-        while (jumlah < 0) {
-            try {
-                jumlah = Integer.parseInt(inputjumlah.getText());
-                if (jumlah <= 0) {
-                    areaoutput.append("Jumlah harus lebih dari 0.\n");
-                }
-            } catch (NumberFormatException ex) {
-                areaoutput.append("Jumlah harus berupa angka.\n");
-            }
-           
-            if (jumlah < 0) {
-                inputjumlah.setText(JOptionPane.showInputDialog("Masukkan jumlah barang:"));
+    private static void operasi() {
+        System.out.printf("Stok\n1. Masuk\n2. Keluar\n");
+        index = findItemIndex(goodsName, itemCount, nama);
+        boolean op = true;
+        while (op) {
+            System.out.println("Klik 1 untuk memasukkan barang atau 2 untuk mengeluarkan barang: ");
+            String operasi = sc.next();
+            sc.nextLine();
+            System.out.println();
+                if (operasi.equals("1")) { 
+                    increase(index);
+                    System.out.println();
+                    break;
+                } else if (operasi.equals("2")) {
+                    decrease(index);
+                    System.out.println();
+                    break;  
+                } else if (!operasi.equals("1") && !operasi.equals("2")) {
+                    continue;
+                }            
+        }
+                return;
+    }
+    private static int findItemIndex(String[] goodsName, int itemCount, String name) {
+        for (int i = 0; i < itemCount; i++) {
+            if (goodsName[i].equalsIgnoreCase(name)) {
+                return i;
             }
         }
-        return jumlah;
+        return -1;
+    }
+    private static int increase(int x) {
+        if (index != -1) {
+            goodsStock[index] += jumlah;
+            if (jumlah == 1) {
+                System.out.println(tanggalwaktu);
+                System.out.println(jumlah + " pc " + goodsName[itemCount-1] + " telah ditambahkan ke dalam Gudang");
+            } else {
+                System.out.println(tanggalwaktu);
+                System.out.println(jumlah + " pcs " + goodsName[itemCount-1] + " telah ditambahkan ke dalam Gudang");
+            }
+        } else {
+            if (itemCount < 100) {
+                goodsName[itemCount] = nama;
+                goodsStock[itemCount] = jumlah;
+                itemCount++;
+                if (jumlah == 1) {
+                    System.out.println(tanggalwaktu);
+                    System.out.println(jumlah + " pc " + goodsName[itemCount-1] + " telah ditambahkan ke dalam Gudang");
+                } else {
+                    System.out.println(tanggalwaktu);
+                    System.out.println(jumlah + " pcs " + goodsName[itemCount-1] + " telah ditambahkan ke dalam Gudang");
+                }
+            } else {
+                System.out.println("Gudang penuh! Tidak dapat menambahkan barang baru.\n");
+            }
+        }
+        return x;
+    }
+    private static int decrease(int x) {
+        index = findItemIndex(goodsName, itemCount, nama);
+            if (index != -1) {
+                goodsStock[index] -= jumlah;
+                if (jumlah == 1) {
+                    System.out.println(tanggalwaktu);
+                    System.out.println(jumlah + " pc " + goodsName[itemCount-1] + " telah dikurangkan dari dalam Gudang");
+                } else {
+                    System.out.println(tanggalwaktu);
+                    System.out.println(jumlah + " pcs " + goodsName[itemCount-1] + " telah dikurangkan dari dalam Gudang");
+                }
+            } else {
+                System.out.println("Tidak ada barang yang dapat dikurangkan");
+            }
+        return x;
+    }
+    private static void view() {
+        System.out.println(tanggalwaktu);
+        System.out.println("Daftar Stok Barang:");
+        for (int i = 0; i < itemCount; i++) {
+            System.out.printf("%-10s: %s\n", goodsName[i], goodsStock[i]);
+        }
+        System.out.println();
+        boolean view = true;
+        while (view) {
+            System.out.println("Klik O untuk melihat stok atau X untuk exit");
+            String exit = sc.nextLine();           
+                if (exit.equalsIgnoreCase("O")) {
+                    view();
+                    break;
+                } else if (exit.equalsIgnoreCase("X")) {
+                    break;
+                } else {
+                    continue;
+                }
+        }
+    }
+    private static void center(String text) {
+        int tengah = (60 - text.length()) / 2;       
+        for (int i = 0; i < tengah; i++) {
+            System.out.print(" ");
+        }        
+        System.out.println(text);
     }
 }
